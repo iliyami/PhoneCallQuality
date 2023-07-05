@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.debaran.core.constants.FrequentlyMessages
 import com.example.debaran.core.theme.DebaranTheme
+import com.example.debaran.core.utils.LocationManagerUtil
 import com.example.debaran.features.callQuality.data.repositories.CallQualityRepositoryImpl
 import com.example.debaran.features.callQuality.domain.usecases.CallQualityChecker
 import com.example.debaran.features.callQuality.views.CallQualityViewModel
@@ -32,14 +33,17 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             DebaranTheme {
-                val isGranted = remember { mutableStateOf(false) }
+                val isLocationOn = remember { mutableStateOf(false) }
                 val launcher = rememberLauncherForActivityResult(
                     contract = ActivityResultContracts.RequestPermission()
                 ) {
-                        isGrantedVal ->
+                        isGranted ->
                     run {
-                        Toast.makeText(this, FrequentlyMessages.permissionDeniedByUser, Toast.LENGTH_SHORT).show()
-                        isGranted.value = isGrantedVal
+                        if (isGranted) {
+                            isLocationOn.value = LocationManagerUtil.turnOnDeviceLocation(this@MainActivity)
+                        } else {
+                            Toast.makeText(this, FrequentlyMessages.permissionDeniedByUser, Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
                 Surface(modifier = Modifier.fillMaxSize(),
@@ -56,7 +60,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    if (isGranted.value) {
+                    if (isLocationOn.value) {
                         val callRepo = CallQualityRepositoryImpl(this@MainActivity)
                         CallQualityChecker(this@MainActivity).startCheckingCallQuality(callRepo)
                         CallQualityViewModel(callRepo).CallQualityView()
