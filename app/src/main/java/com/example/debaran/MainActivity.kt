@@ -1,7 +1,6 @@
 package com.example.debaran
 
 import android.Manifest
-import android.content.Context
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -22,7 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import com.example.debaran.core.constants.FrequentlyMessages
 import com.example.debaran.core.theme.DebaranTheme
 import com.example.debaran.features.callQuality.data.repositories.CallQualityRepositoryImpl
 import com.example.debaran.features.callQuality.domain.usecases.CallQualityChecker
@@ -39,11 +38,9 @@ class MainActivity : ComponentActivity() {
                 ) {
                         isGrantedVal ->
                     run {
-                        Toast.makeText(this, "isGranted = $isGranted", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, FrequentlyMessages.permissionDeniedByUser, Toast.LENGTH_SHORT).show()
                         isGranted.value = isGrantedVal
                     }
-
-
                 }
                 Surface(modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -65,36 +62,19 @@ class MainActivity : ComponentActivity() {
                         CallQualityViewModel(callRepo).CallQualityView()
                     }
                     else {
-                        Greeting("No Permissions")
+                        Alert("No Permissions")
                     }
                 }
-//                CallQualityView().QualityButton(callQualityChecker = CallQualityChecker(this))
-//                val contact = "+989122647213"
-//                val intent = Intent(Intent.ACTION_DIAL)
-//                intent.data = Uri.parse("tel:$contact")
-//                startActivity(intent)
             }
         }
     }
 }
 
-@Composable
-fun FABBuilder(context: Context) {
-
-}
 
 @Composable
-fun Greeting(text: String, modifier: Modifier = Modifier) {
+fun Alert(text: String, modifier: Modifier = Modifier) {
     Text(
         text = "$text!",
         modifier = modifier
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    DebaranTheme {
-        Greeting("Android")
-    }
 }
