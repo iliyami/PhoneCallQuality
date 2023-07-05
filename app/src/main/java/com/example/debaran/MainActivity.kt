@@ -1,50 +1,72 @@
 package com.example.debaran
 
+import android.Manifest
+import android.content.Context
 import android.os.Bundle
-import android.telephony.TelephonyManager
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Call
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.debaran.core.theme.DebaranTheme
 import com.example.debaran.features.callQuality.data.repositories.CallQualityRepositoryImpl
 import com.example.debaran.features.callQuality.domain.usecases.CallQualityChecker
 import com.example.debaran.features.callQuality.views.CallQualityViewModel
-import com.example.debaran.ui.theme.DebaranTheme
 
 class MainActivity : ComponentActivity() {
-
-    private val telephonyManager: TelephonyManager by lazy {
-        getSystemService(TelephonyManager::class.java)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             DebaranTheme {
-                // A surface container using the 'background' color from the theme
-//                Surface(
-//                    modifier = Modifier.fillMaxSize(),
-//                    color = MaterialTheme.colorScheme.background
-//                ) {
-//                    Greeting("Android")
-//                }
+                val isGranted = remember { mutableStateOf(false) }
+                val launcher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.RequestPermission()
+                ) {
+                        isGrantedVal ->
+                    run {
+                        Toast.makeText(this, "isGranted = $isGranted", Toast.LENGTH_SHORT).show()
+                        isGranted.value = isGrantedVal
+                    }
+
+
+                }
                 Surface(modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val callRepo = CallQualityRepositoryImpl(this)
-                    CallQualityChecker(this).startCheckingCallQuality(callRepo)
-                    CallQualityViewModel(callRepo).CallQualityView()
+                    Box (
+                        Modifier.fillMaxSize(),
+                        Alignment.Center
+                    ) {
+                        FloatingActionButton(onClick = {
+                            launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                        }) {
+                            Icon(Icons.Rounded.Call, "Call")
+                        }
+                    }
+
+                    if (isGranted.value) {
+                        val callRepo = CallQualityRepositoryImpl(this@MainActivity)
+                        CallQualityChecker(this@MainActivity).startCheckingCallQuality(callRepo)
+                        CallQualityViewModel(callRepo).CallQualityView()
+                    }
+                    else {
+                        Greeting("No Permissions")
+                    }
                 }
 //                CallQualityView().QualityButton(callQualityChecker = CallQualityChecker(this))
 //                val contact = "+989122647213"
@@ -57,22 +79,14 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun FABBuilder() {
-    FloatingActionButton(onClick = { /*TODO*/ },
-        shape = RoundedCornerShape(16),
-    ) {
-        Icon(
-            imageVector = Icons.Rounded.Add,
-            contentDescription = "Add FAB",
-            tint = Color.White,
-        )
-    }
+fun FABBuilder(context: Context) {
+
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
+fun Greeting(text: String, modifier: Modifier = Modifier) {
     Text(
-        text = "Hello $name!",
+        text = "$text!",
         modifier = modifier
     )
 }

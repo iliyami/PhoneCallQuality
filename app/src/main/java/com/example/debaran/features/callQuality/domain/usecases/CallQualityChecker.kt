@@ -9,7 +9,7 @@ import android.telephony.CellInfoLte
 import android.telephony.CellInfoNr
 import android.telephony.TelephonyManager
 import androidx.core.app.ActivityCompat
-import com.example.debaran.features.callQuality.data.repositories.CallQualityRepositoryImpl
+import com.example.debaran.core.utils.Conversions
 import com.example.debaran.features.callQuality.domain.entities.CallQuality
 import com.example.debaran.features.callQuality.domain.repositories.CallQualityRepository
 import java.util.Timer
@@ -23,42 +23,59 @@ class CallQualityChecker(private val context: Context) {
 
     fun getSignalStrengthLevel(): String {
         val signalStrength = telephonyManager.signalStrength
-        val callQuality: String = when (signalStrength?.level) {
+        val callQualityLevel: String = when (signalStrength?.level) {
             0 -> "Unknown"
             1 -> "Poor"
             2 -> "Moderate"
             3 -> "Good"
             4 -> "Great"
-            else -> "Unknown"
+            else -> "Error"
         }
-        return callQuality
+        return callQualityLevel
     }
 
     fun getBestCellInfo(): CellInfo? {
         val cellInfoList = if (ActivityCompat.checkSelfPermission(
                 context,
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
+            ) == PackageManager.PERMISSION_GRANTED
         ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return null
-        } else
             telephonyManager.allCellInfo
+        } else
+            return null
+
+        if (cellInfoList.isEmpty()) {
+            return null
+        }
 
         return cellInfoList[0]
 
-        // Calculate a weighted average of the RSRP, RSRQ, SINR, and MOS values
-//        val callQuality = (0.2 * rsrp + 0.3 * rsrq + 0.4 * sinr + 0.1 * mos) / 1.0
+
 
         // Update the call quality state
 //        callQuality.value = callQuality
 
+    }
+
+
+    fun getAvgCallQuality(cellInfo: CellInfo): Double? {
+        // Calculate a weighted average of the RSRP, RSRQ, SINR, and MOS values
+        when (cellInfo) {
+            // EUTRAN (4G LTE): RSRP, RSRQ, RSSNR
+            is CellInfoLte -> {
+                val cellDetail = cellInfo.cellSignalStrength
+                return (0.2 * cellDetail.rsrp + 0.3 * cellDetail.rsrq + 0.4 * (Conversions.dBTodBm(cellDetail.rssnr )) /*+ 0.1 * mos*/) / 1.0
+            }
+
+            // NGRAN (5G NR): SSRSRP, SSRSRQ, SSSINR
+            is CellInfoNr -> {
+                val cellDetail = cellInfo.cellSignalStrength
+                return (0.2 * cellDetail.dbm + 0.3 * cellDetail.asuLevel + 0.4 * cellDetail.dbm /*+ 0.1 * mos*/) / 1.0
+            }
+
+            else -> null
+        }
+        return null
     }
 
     fun startCheckingCallQuality(callQualityRepo: CallQualityRepository) {
@@ -67,11 +84,14 @@ class CallQualityChecker(private val context: Context) {
         timer.scheduleAtFixedRate(
             object : TimerTask() {
                 override fun run() {
+                    val bestCellInfo = getBestCellInfo()
+                    val newCallQuality = CallQuality(
+                        getSignalStrengthLevel(),
+                        bestCellInfo,
+                        if (bestCellInfo == null) null else getAvgCallQuality(bestCellInfo)
+                    )
                     callQualityRepo.getCallQuality(
-                        CallQuality(
-                            getSignalStrengthLevel(),
-                            getBestCellInfo(),
-                        )
+                        newCallQuality
                     )
                 }
             },

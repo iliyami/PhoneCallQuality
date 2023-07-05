@@ -4,38 +4,47 @@ import android.telephony.CellInfo
 import android.telephony.CellInfoLte
 import android.telephony.CellInfoNr
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.ViewModel
+import com.example.debaran.core.utils.Conversions
 import com.example.debaran.features.callQuality.domain.repositories.CallQualityRepository
 
 class CallQualityViewModel(
-    private val repository: CallQualityRepository
+    repository: CallQualityRepository
 ) : ViewModel() {
 
     private val callQualityLiveData = repository.getCallQualityLiveData()
 
     @Composable
     fun CallQualityView() {
+        val callQualityState = callQualityLiveData.observeAsState()
         Column {
             Text(text = "Call Quality")
-            Text(text = "Signal Strength Level: ${callQualityLiveData.value?.signalStrengthLevel}")
-            cellInfoView(cellInfo = callQualityLiveData.value?.cellInfo)
+            Text(text = "Signal Strength Level: ${callQualityState.value?.signalStrengthLevel}")
+            CellInfoView(cellInfo = callQualityState.value?.cellInfo)
+            val totalCallQuality = callQualityState.value?.totalCallQuality
+            if (totalCallQuality != null) {
+                Text(
+                    text = "Total Call Quality: ${String.format("%.2f", totalCallQuality)}",
+                )
+            }
         }
     }
 
     @Composable
-    fun cellInfoView(cellInfo: CellInfo?) {
+    fun CellInfoView(cellInfo: CellInfo?) {
         when (cellInfo) {
             // EUTRAN (4G LTE): RSRP, RSRQ, RSSNR
             is CellInfoLte -> {
                 Column() {
-                    Text(text = "Level: ${cellInfo.cellSignalStrength.level}")
-                    Text(text = "RSRP: ${cellInfo.cellSignalStrength.rsrp}")
+                    Text(text = "RSRP [dbM]: ${cellInfo.cellSignalStrength.rsrp}")
                     Text(text = "RSRQ: ${cellInfo.cellSignalStrength.rsrq}")
-                    Text(text = "RSSNR: ${cellInfo.cellSignalStrength.rssnr}")
-                    Text(text = "RSSI: ${cellInfo.cellSignalStrength.rssi}")
+                    Text(text = "RSSI [dbM]: ${cellInfo.cellSignalStrength.rssi}")
+                    Text(text = "Signal-to-Noise [dBm]: " +
+                            String.format("%.2f", Conversions.dBTodBm(cellInfo.cellSignalStrength.rssnr))
+                    )
                 }
             }
 

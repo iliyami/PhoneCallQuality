@@ -1,4 +1,4 @@
-package com.example.debaran.ui.theme
+package com.example.debaran.core.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

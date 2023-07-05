@@ -21,6 +21,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Debaran"
         tools:targetApi="31">
+<!--        <service-->
+<!--            android:name="MyNavigationService"-->
+<!--            android:foregroundServiceType="location"  >-->
+<!--        &lt;!&ndash; Any inner elements go here. &ndash;&gt;-->
+<!--        </service>-->
         <activity
             android:name=".MainActivity"
             android:exported="true"

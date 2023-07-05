@@ -1,4 +1,4 @@
-package com.example.debaran.ui.theme
+package com.example.debaran.core.theme
 
 import androidx.compose.ui.graphics.Color
 

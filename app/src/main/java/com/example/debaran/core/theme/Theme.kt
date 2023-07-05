@@ -1,4 +1,4 @@
-package com.example.debaran.ui.theme
+package com.example.debaran.core.theme
 
 import android.app.Activity
 import android.os.Build

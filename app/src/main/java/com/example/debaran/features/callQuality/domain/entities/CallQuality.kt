@@ -5,4 +5,5 @@ import android.telephony.CellInfo
 data class CallQuality(
     val signalStrengthLevel: String,
     val cellInfo: CellInfo?,
+    val totalCallQuality: Double?,
 )
