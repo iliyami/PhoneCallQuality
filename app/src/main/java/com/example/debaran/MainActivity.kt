@@ -2,6 +2,9 @@ package com.example.debaran
 
 import android.Manifest
 import android.os.Bundle
+import android.telephony.TelephonyCallback.CallStateListener
+import android.telephony.TelephonyManager
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -17,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -25,7 +29,10 @@ import com.example.debaran.core.constants.FrequentlyMessages
 import com.example.debaran.core.theme.DebaranTheme
 import com.example.debaran.core.utils.LocationManagerUtil
 import com.example.debaran.features.callQuality.data.repositories.CallQualityRepositoryImpl
+import com.example.debaran.features.callQuality.data.repositories.CallStateRepositoryImpl
+import com.example.debaran.features.callQuality.domain.entities.MyCallState
 import com.example.debaran.features.callQuality.domain.usecases.CallQualityChecker
+import com.example.debaran.features.callQuality.domain.usecases.PhoneStateChecker
 import com.example.debaran.features.callQuality.views.CallQualityViewModel
 
 class MainActivity : ComponentActivity() {
@@ -33,6 +40,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             DebaranTheme {
+                // Phone State Checker Initialization
+                val phoneStateChecker = PhoneStateChecker(this)
+                phoneStateChecker.registerPhoneStateChecker()
+                val callStateRepo = CallStateRepositoryImpl.getInstance()
+                val callState = callStateRepo.getCallStateLiveData().observeAsState()
+
+                // Call Quality Checker Initialization
+                val callRepo = CallQualityRepositoryImpl(this@MainActivity)
+
                 val isLocationOn = remember { mutableStateOf(false) }
                 val launcher = rememberLauncherForActivityResult(
                     contract = ActivityResultContracts.RequestPermission()
@@ -54,20 +70,32 @@ class MainActivity : ComponentActivity() {
                         Alignment.Center
                     ) {
                         FloatingActionButton(onClick = {
-                            launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                            if (isLocationOn.value) {
+                                callStateRepo.setCallStateLiveData(MyCallState(phoneStateChecker.getCallState(),
+                                    ""))
+                                if (phoneStateChecker.getCallState() == TelephonyManager.CALL_STATE_OFFHOOK)
+                                    CallQualityChecker(this@MainActivity).startCheckingCallQuality(
+                                        callRepo
+                                    )
+                                else {
+                                    // TODO
+                                //  stop the timer for better experience
+                                }
+                            } else
+                                launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                         }) {
                             Icon(Icons.Rounded.Call, "Call")
                         }
                     }
 
                     if (isLocationOn.value) {
-                        val callRepo = CallQualityRepositoryImpl(this@MainActivity)
-                        CallQualityChecker(this@MainActivity).startCheckingCallQuality(callRepo)
-                        CallQualityViewModel(callRepo).CallQualityView()
+                        if (callState.value?.callState == TelephonyManager.CALL_STATE_OFFHOOK)
+                            CallQualityViewModel(callRepo).CallQualityView()
+                        else
+                            Alert("No Call in Process!")
                     }
-                    else {
-                        Alert("No Permissions")
-                    }
+                    else
+                        Alert("Click To Get Permission!")
                 }
             }
         }
@@ -78,7 +106,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Alert(text: String, modifier: Modifier = Modifier) {
     Text(
-        text = "$text!",
+        text = "$text",
         modifier = modifier
     )
 }

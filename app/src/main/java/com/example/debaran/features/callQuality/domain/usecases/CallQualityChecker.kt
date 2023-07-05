@@ -79,6 +79,7 @@ class CallQualityChecker(private val context: Context) {
     }
 
     fun startCheckingCallQuality(callQualityRepo: CallQualityRepository) {
+        if (callQualityRepo.getCallQualityLiveData().value != null) return
         // Start a timer to check the call quality every 1 second
         val timer = Timer()
         timer.scheduleAtFixedRate(
