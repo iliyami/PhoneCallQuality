@@ -9,6 +9,7 @@ import android.telephony.CellInfoLte
 import android.telephony.CellInfoNr
 import android.telephony.TelephonyManager
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.MutableLiveData
 import com.example.debaran.core.utils.Conversions
 import com.example.debaran.features.callQuality.domain.entities.CallQuality
 import com.example.debaran.features.callQuality.domain.repositories.CallQualityRepository
@@ -16,10 +17,28 @@ import java.util.Timer
 import java.util.TimerTask
 
 
-class CallQualityChecker(private val context: Context) {
+class CallMonitoring(private val context: Context) {
     private val telephonyManager =
         context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
+    companion object {
+        val isMeasuring: MutableLiveData<Boolean> by lazy {
+            MutableLiveData<Boolean>()
+        }
+
+        var timer = Timer()
+    }
+
+    fun connect(callQualityRepo: CallQualityRepository) {
+        isMeasuring.postValue(true)
+        startCheckingCallQuality(callQualityRepo)
+    }
+
+    fun disconnect() {
+        timer.cancel()
+        timer.purge()
+        isMeasuring.postValue(false)
+    }
 
     fun getSignalStrengthLevel(): String {
         val signalStrength = telephonyManager.signalStrength
@@ -79,9 +98,8 @@ class CallQualityChecker(private val context: Context) {
     }
 
     fun startCheckingCallQuality(callQualityRepo: CallQualityRepository) {
-        if (callQualityRepo.getCallQualityLiveData().value != null) return
         // Start a timer to check the call quality every 1 second
-        val timer = Timer()
+        timer = Timer()
         timer.scheduleAtFixedRate(
             object : TimerTask() {
                 override fun run() {
