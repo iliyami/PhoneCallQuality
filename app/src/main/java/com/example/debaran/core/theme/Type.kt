@@ -2,33 +2,60 @@ package com.example.debaran.core.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.ExperimentalUnitApi
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.sp
+import com.example.debaran.R
+import com.example.debaran.core.theme.Dimen.sp13
+import com.example.debaran.core.theme.Dimen.sp14
+import com.example.debaran.core.theme.Dimen.sp16
+import com.example.debaran.core.theme.Dimen.sp24
+import com.example.debaran.core.theme.Dimen.sp25
 
-// Set of Material typography styles to start with
+val jostRegular = FontFamily(
+  Font(R.font.jost_regular)
+)
+
+val jostMedium = FontFamily(
+  Font(R.font.jost_medium)
+)
+
+val jostBold = FontFamily(
+  Font(R.font.jost_bold)
+)
+
+@OptIn(ExperimentalUnitApi::class)
 val Typography = Typography(
-    bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
-    )
-    /* Other default text styles to override
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
-    ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
-    )
-    */
+  headlineLarge = TextStyle(
+    fontFamily = jostRegular,
+    fontSize = sp25
+  ),
+  headlineMedium = TextStyle(
+    fontFamily = jostMedium,
+    fontSize = sp24
+  ),
+  headlineSmall = TextStyle(
+    fontFamily = jostMedium,
+    fontWeight = FontWeight.W700,
+    fontSize = sp16
+  ),
+  titleLarge = TextStyle(
+    fontFamily = jostBold,
+    letterSpacing = TextUnit(0.8f, TextUnitType.Sp),
+    fontSize = sp14
+  ),
+  titleMedium = TextStyle(
+    fontFamily = jostBold,
+    letterSpacing = TextUnit(0.8f, TextUnitType.Sp),
+    fontSize = sp13
+  ),
+  labelMedium = TextStyle(
+    fontFamily = jostMedium,
+    fontWeight = FontWeight.W700,
+    fontSize = 14.sp
+  )
 )
