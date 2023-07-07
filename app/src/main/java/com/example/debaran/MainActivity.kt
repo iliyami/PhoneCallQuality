@@ -102,12 +102,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-
-//@Composable
-//fun Alert(text: String, modifier: Modifier = Modifier) {
-//    Text(
-//        text = "$text",
-//        modifier = modifier
-//    )
-//}
