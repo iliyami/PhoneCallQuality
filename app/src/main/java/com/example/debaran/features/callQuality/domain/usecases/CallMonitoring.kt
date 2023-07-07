@@ -9,17 +9,39 @@ import android.telephony.CellInfoLte
 import android.telephony.CellInfoNr
 import android.telephony.TelephonyManager
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.MutableLiveData
 import com.example.debaran.core.utils.Conversions
 import com.example.debaran.features.callQuality.domain.entities.CallQuality
 import com.example.debaran.features.callQuality.domain.repositories.CallQualityRepository
+import com.example.debaran.features.callQuality.views.components.ConnectivityStatus
 import java.util.Timer
 import java.util.TimerTask
 
 
-class CallQualityChecker(private val context: Context) {
+class CallMonitoring(private val context: Context) {
     private val telephonyManager =
         context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
+    companion object {
+        val connectivityStatus: MutableLiveData<ConnectivityStatus> by lazy {
+            MutableLiveData<ConnectivityStatus>()
+        }
+
+        var timer = Timer()
+    }
+
+    fun connect(callQualityRepo: CallQualityRepository) {
+//        connectivityStatus.postValue(ConnectivityStatus.CONNECTING)
+//        delay(5000)
+        connectivityStatus.postValue(ConnectivityStatus.CONNECTED)
+        startCheckingCallQuality(callQualityRepo)
+    }
+
+    fun disconnect() {
+        timer.cancel()
+        timer.purge()
+        connectivityStatus.value = ConnectivityStatus.DISCONNECT
+    }
 
     fun getSignalStrengthLevel(): String {
         val signalStrength = telephonyManager.signalStrength
@@ -49,12 +71,6 @@ class CallQualityChecker(private val context: Context) {
         }
 
         return cellInfoList[0]
-
-
-
-        // Update the call quality state
-//        callQuality.value = callQuality
-
     }
 
 
@@ -72,16 +88,13 @@ class CallQualityChecker(private val context: Context) {
                 val cellDetail = cellInfo.cellSignalStrength
                 return (0.2 * cellDetail.dbm + 0.3 * cellDetail.asuLevel + 0.4 * cellDetail.dbm /*+ 0.1 * mos*/) / 1.0
             }
-
-            else -> null
         }
         return null
     }
 
     fun startCheckingCallQuality(callQualityRepo: CallQualityRepository) {
-        if (callQualityRepo.getCallQualityLiveData().value != null) return
         // Start a timer to check the call quality every 1 second
-        val timer = Timer()
+        timer = Timer()
         timer.scheduleAtFixedRate(
             object : TimerTask() {
                 override fun run() {

@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">Debaran</string>
+    <string name="status_connect">START</string>
+    <string name="status_disconnect">DISCONNECT</string>
+    <string name="status_connecting">IN PROGRESS</string>
+    <string name="status_connected">MEASURING</string>
+    <string name="status_reconnecting">RECONNECTING</string>
+    <string name="no_call_in_progress">There is no call in progress!</string>
+    <string name="error_no_activity_url">Could not find a browser to launch a url</string>
+    <string name="developer_github">https://github.com/iliyami</string>
+    <string name="measurement_details_title">Measurement Details:</string>
+    <string name="wait_for_call">WAIT FOR A CALL</string>
+    <string name="tap_to_start">TAP TO START!</string>
+    <string name="no_call_detected">NO CALL DETECTED!</string>
+    <string name="call">CALL</string>
+    <string name="enter_your_number">Enter your number</string>
+    <string name="permission_denied_by_user">Permission denied by user!</string>
+    <string name="please_turn_on_location">Please turn on your location!</string>
+
 </resources>
