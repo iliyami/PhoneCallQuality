@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -23,16 +24,16 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.LiveData
+import com.example.debaran.R
+import com.example.debaran.core.extensions.clickableNoIndication
 import com.example.debaran.core.theme.*
+import com.example.debaran.core.theme.Dimen.dp160
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import com.example.debaran.R
-import com.example.debaran.core.theme.Dimen.dp160
-import com.example.debaran.core.extensions.clickableNoIndication
 
 enum class ConnectivityStatus {
     NONE,
@@ -43,7 +44,6 @@ enum class ConnectivityStatus {
 
     fun isConnecting(): Boolean = this == CONNECTING || this == RECONNECTING
     fun isConnected(): Boolean = this == CONNECTED
-    fun isDisconnected(): Boolean = this == NONE || this == DISCONNECT
 }
 
 private enum class CircularAnimateState {
@@ -75,9 +75,11 @@ private fun getStatusAsText(context: Context, status: ConnectivityStatus): Strin
 @Composable
 fun CircularBox(
     modifier: Modifier = Modifier,
-    status: ConnectivityStatus,
+    statusLiveData: LiveData<ConnectivityStatus>,
     onClick: () -> Unit,
 ) {
+    val statusState = statusLiveData.observeAsState()
+    val status = statusState.value!!
     val context = LocalContext.current
 
     val radiusPx = with(LocalDensity.current) { diameter.toPx() / 2 }
@@ -145,7 +147,8 @@ fun CircularBox(
     val alphaText = remember { Animatable(1f) }
 
     BoxWithConstraints(
-        modifier = Modifier.height(boxHeight)
+        modifier = Modifier
+            .height(boxHeight)
             .clickableNoIndication(onClick)
     ) {
         Text(
@@ -510,47 +513,47 @@ fun CircularBox(
     }
 }
 
-@Preview
-@Composable
-fun DefaultPreview() {
-    DebaranTheme {
-        CircularBox(status = ConnectivityStatus.NONE) {}
-    }
-}
-
-@Preview
-@Composable
-fun PlaygroundPreview() {
-    val status = remember { mutableStateOf(ConnectivityStatus.NONE) }
-
-    LaunchedEffect(status.value) {
-        if (status.value == ConnectivityStatus.CONNECTING) {
-            delay(5000)
-            status.value = ConnectivityStatus.RECONNECTING
-            delay(4000)
-            status.value = ConnectivityStatus.CONNECTED
-        }
-    }
-
-    DebaranTheme {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            CircularBox(status = status.value) {}
-            Spacer(modifier = Modifier.height(30.dp))
-            ThemeButton(
-                onClick = {
-                    when (status.value) {
-                        ConnectivityStatus.NONE -> status.value = ConnectivityStatus.CONNECTING
-                        ConnectivityStatus.CONNECTED -> status.value = ConnectivityStatus.DISCONNECT
-                        else -> status.value = ConnectivityStatus.NONE
-                    }
-                },
-                text = if (status.value == ConnectivityStatus.DISCONNECT || status.value == ConnectivityStatus.NONE)
-                    "Connect" else "Disconnect"
-            )
-        }
-    }
-}
+//@Preview
+//@Composable
+//fun DefaultPreview() {
+//    DebaranTheme {
+//        CircularBox(statusLiveData = ConnectivityStatus.NONE) {}
+//    }
+//}
+//
+//@Preview
+//@Composable
+//fun PlaygroundPreview() {
+//    val status = remember { mutableStateOf(ConnectivityStatus.NONE) }
+//
+//    LaunchedEffect(status.value) {
+//        if (status.value == ConnectivityStatus.CONNECTING) {
+//            delay(5000)
+//            status.value = ConnectivityStatus.RECONNECTING
+//            delay(4000)
+//            status.value = ConnectivityStatus.CONNECTED
+//        }
+//    }
+//
+//    DebaranTheme {
+//        Column(
+//            modifier = Modifier.fillMaxSize(),
+//            verticalArrangement = Arrangement.Center,
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//            CircularBox(status = status.value) {}
+//            Spacer(modifier = Modifier.height(30.dp))
+//            ThemeButton(
+//                onClick = {
+//                    when (status.value) {
+//                        ConnectivityStatus.NONE -> status.value = ConnectivityStatus.CONNECTING
+//                        ConnectivityStatus.CONNECTED -> status.value = ConnectivityStatus.DISCONNECT
+//                        else -> status.value = ConnectivityStatus.NONE
+//                    }
+//                },
+//                text = if (status.value == ConnectivityStatus.DISCONNECT || status.value == ConnectivityStatus.NONE)
+//                    "Connect" else "Disconnect"
+//            )
+//        }
+//    }
+//}

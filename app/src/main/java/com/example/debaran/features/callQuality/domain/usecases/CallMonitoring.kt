@@ -14,7 +14,6 @@ import com.example.debaran.core.utils.Conversions
 import com.example.debaran.features.callQuality.domain.entities.CallQuality
 import com.example.debaran.features.callQuality.domain.repositories.CallQualityRepository
 import com.example.debaran.features.callQuality.views.components.ConnectivityStatus
-import kotlinx.coroutines.delay
 import java.util.Timer
 import java.util.TimerTask
 
@@ -41,7 +40,7 @@ class CallMonitoring(private val context: Context) {
     fun disconnect() {
         timer.cancel()
         timer.purge()
-        connectivityStatus.postValue(ConnectivityStatus.DISCONNECT)
+        connectivityStatus.value = ConnectivityStatus.DISCONNECT
     }
 
     fun getSignalStrengthLevel(): String {
@@ -72,12 +71,6 @@ class CallMonitoring(private val context: Context) {
         }
 
         return cellInfoList[0]
-
-
-
-        // Update the call quality state
-//        callQuality.value = callQuality
-
     }
 
 
@@ -95,8 +88,6 @@ class CallMonitoring(private val context: Context) {
                 val cellDetail = cellInfo.cellSignalStrength
                 return (0.2 * cellDetail.dbm + 0.3 * cellDetail.asuLevel + 0.4 * cellDetail.dbm /*+ 0.1 * mos*/) / 1.0
             }
-
-            else -> null
         }
         return null
     }

@@ -15,5 +15,6 @@
     <string name="call">CALL</string>
     <string name="enter_your_number">Enter your number</string>
     <string name="permission_denied_by_user">Permission denied by user!</string>
+    <string name="please_turn_on_location">Please turn on your location!</string>
 
 </resources>
