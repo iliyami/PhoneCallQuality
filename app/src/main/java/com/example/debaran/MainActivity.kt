@@ -3,27 +3,9 @@ package com.example.debaran
 import android.Manifest
 import android.os.Bundle
 import android.telephony.TelephonyManager
-import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Call
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import com.example.debaran.core.constants.FrequentlyMessages
 import com.example.debaran.core.theme.DebaranTheme
 import com.example.debaran.core.utils.LocationManagerUtil
 import com.example.debaran.core.utils.LocationManagerUtil.requestLocationAccess
@@ -33,8 +15,9 @@ import com.example.debaran.features.callQuality.domain.entities.MyCallState
 import com.example.debaran.features.callQuality.domain.usecases.CallMonitoring
 import com.example.debaran.features.callQuality.domain.usecases.Dialer
 import com.example.debaran.features.callQuality.domain.usecases.PhoneStateChecker
-import com.example.debaran.features.callQuality.views.CallQualityViewModel
 import com.example.debaran.features.callQuality.views.DashboardScreen
+import com.example.debaran.features.callQuality.views.components.ConnectivityStatus
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,31 +36,29 @@ class MainActivity : ComponentActivity() {
                 phoneStateChecker.registerPhoneStateChecker()
                 val callStateRepo = CallStateRepositoryImpl.getInstance()
                 val callState = callStateRepo.getCallStateLiveData().observeAsState()
-
+                CallMonitoring.connectivityStatus.value = ConnectivityStatus.NONE
                 DashboardScreen(
                     onConnectClick = {
                         if (hasLocationAccess.value == true) {
-                            callMonitoring.connect(callRepo)
                             callStateRepo.setCallStateLiveData(
                                 MyCallState(
                                     phoneStateChecker.getCallState(),
                                     ""
                                 )
                             )
-                            if (phoneStateChecker.getCallState() == TelephonyManager.CALL_STATE_OFFHOOK)
-                                CallMonitoring(this@MainActivity).startCheckingCallQuality(
-                                    callRepo
-                                )
+                            if (phoneStateChecker.getCallState() == TelephonyManager.CALL_STATE_OFFHOOK) {
+                                callMonitoring.connect(callRepo)
+                            }
                             else {
-                                // TODO
-                                //  stop the timer for better experience
+                                callMonitoring.disconnect()
                             }
                         }
                         else
                             launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                                      },
                     onDisconnect = {callMonitoring.disconnect()},
-                    onCallClick = {Dialer.getInstance().dial(this)},
+                    onCallClick = {Dialer.getInstance().dial(this, this)},
+                    connectivityStatus = CallMonitoring.connectivityStatus.value!!
                 )
 
 

@@ -1,5 +1,7 @@
 package com.example.debaran.features.callQuality.views
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -42,6 +46,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.debaran.R
 import com.example.debaran.core.theme.DebaranTheme
+import com.example.debaran.core.theme.Dimen.dp100
+import com.example.debaran.core.theme.Dimen.dp120
+import com.example.debaran.core.theme.Dimen.dp150
+import com.example.debaran.core.theme.Dimen.dp55
 import com.example.debaran.core.theme.Dimen.dp90
 import com.example.debaran.core.theme.cyanDark
 import com.example.debaran.core.theme.purpleColor
@@ -140,7 +148,7 @@ fun DashboardScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(15.dp)
-                .height(dp90)
+                .height(dp100)
                 .border(
                     border = BorderStroke(
                         width = 2.dp,
@@ -154,19 +162,46 @@ fun DashboardScreen(
         ) {
             TxtField()
 
-            Spacer(modifier = Modifier.padding(start = 10.dp))
+//            Spacer(modifier = Modifier.padding(start = 10.dp))
+//
+//
+        }
 
+        Spacer(modifier = Modifier.width(10.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(5.dp)
+                .padding(horizontal = 32.dp)
+                .height(dp55)
+        ) {
             ThemeButton(
                 onClick = onCallClick,
                 modifier = Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(10.dp))
                     .fillMaxHeight()
-                    .clip(RoundedCornerShape(5.dp)),
+                    .animateContentSize(),
                 text = stringResource(R.string.call),
                 enabled = !connectivityStatus.isConnected() && !connectivityStatus.isConnecting()
             )
+
+//            AnimatedVisibility(visible = connectivityStatus.isConnecting()) {
+//                ThemeButton(
+//                    onClick = onDisconnect,
+//                    modifier = Modifier
+//                        .padding(start = 20.dp)
+//                        .clip(RoundedCornerShape(10.dp))
+//                        .fillMaxHeight(),
+//                    text = stringResource(R.string.stop)
+//                )
+//            }
         }
 
-            Spacer(modifier = Modifier.width(10.dp))
+        Spacer(modifier = Modifier.height(20.dp))
+
+
     }
 }
 
@@ -176,20 +211,19 @@ fun TxtField() {
     val dialer = Dialer.getInstance()
     val placeHolder = stringResource(R.string.enter_your_number)
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
             .fillMaxHeight(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     )
     {
+        val dialValueState = dialer.dialerValue.observeAsState()
         TextField(
-            value = dialer.dialerValue.value ?: "",
-            onValueChange = { dialer.dialerValue.postValue(it) },
+            value = dialValueState.value ?: "",
+            onValueChange = { dialer.dialerValue.value = it },
             placeholder = { Text(text = placeHolder) },
             modifier = Modifier
-                .padding(all = 16.dp)
-                .fillMaxWidth(),
+                .padding(all = 4.dp).fillMaxWidth(),
             keyboardOptions = KeyboardOptions(
                 // below line is use for capitalization
                 // inside our text field.

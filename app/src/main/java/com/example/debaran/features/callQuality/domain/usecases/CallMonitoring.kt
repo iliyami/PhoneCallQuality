@@ -13,6 +13,8 @@ import androidx.lifecycle.MutableLiveData
 import com.example.debaran.core.utils.Conversions
 import com.example.debaran.features.callQuality.domain.entities.CallQuality
 import com.example.debaran.features.callQuality.domain.repositories.CallQualityRepository
+import com.example.debaran.features.callQuality.views.components.ConnectivityStatus
+import kotlinx.coroutines.delay
 import java.util.Timer
 import java.util.TimerTask
 
@@ -22,22 +24,24 @@ class CallMonitoring(private val context: Context) {
         context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
     companion object {
-        val isMeasuring: MutableLiveData<Boolean> by lazy {
-            MutableLiveData<Boolean>()
+        val connectivityStatus: MutableLiveData<ConnectivityStatus> by lazy {
+            MutableLiveData<ConnectivityStatus>()
         }
 
         var timer = Timer()
     }
 
     fun connect(callQualityRepo: CallQualityRepository) {
-        isMeasuring.postValue(true)
+//        connectivityStatus.postValue(ConnectivityStatus.CONNECTING)
+//        delay(5000)
+        connectivityStatus.postValue(ConnectivityStatus.CONNECTED)
         startCheckingCallQuality(callQualityRepo)
     }
 
     fun disconnect() {
         timer.cancel()
         timer.purge()
-        isMeasuring.postValue(false)
+        connectivityStatus.postValue(ConnectivityStatus.DISCONNECT)
     }
 
     fun getSignalStrengthLevel(): String {

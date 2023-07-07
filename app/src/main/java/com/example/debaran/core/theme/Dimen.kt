@@ -43,6 +43,7 @@ object Dimen {
     val dp250 by ResponsiveDimensions(250.dp, 180.dp)
     val dp160 by ResponsiveDimensions(160.dp, 120.dp)
     val dp150 by ResponsiveDimensions(150.dp, 130.dp)
+    val dp120 by ResponsiveDimensions(120.dp, 100.dp)
     val dp100 by ResponsiveDimensions(100.dp, 80.dp)
     val dp90 by ResponsiveDimensions(90.dp, 70.dp)
     val dp55 by ResponsiveDimensions(55.dp, 45.dp)

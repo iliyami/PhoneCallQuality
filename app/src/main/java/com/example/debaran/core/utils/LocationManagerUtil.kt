@@ -4,16 +4,12 @@ import android.content.Context
 import android.content.Intent
 import android.location.LocationManager
 import android.provider.Settings
-import android.widget.Toast
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.MutableLiveData
 import com.example.debaran.R
-import com.example.debaran.core.constants.FrequentlyMessages
-import com.example.debaran.core.utils.AppUtils.launchUrl
-import com.example.debaran.features.callQuality.domain.entities.MyCallState
 import es.dmoral.toasty.Toasty
 
 object LocationManagerUtil {
