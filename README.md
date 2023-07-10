@@ -51,9 +51,7 @@ Total Call Quality (5G) = RSRP * RSRQ + RSSI - SNR + Weighted Score (5G)
 This initial program version incorporates the above parameters and formulas to determine the call quality.
 
 
-<img src="images/4.jpg" width="350" title="First Version">
-
-![alt text](https://github.com/iliyami/PhoneCallQuality/blob/master/images/4.jpg)
+<img src="images/4.jpg" width="200" title="First Version">
 
 
 
@@ -65,9 +63,9 @@ Furthermore, all the code in this program has been developed following clean arc
 
 Additionally, the implementation of this program has been carried out for both 4G and 5G networks, ensuring compatibility with both generations.
 
-![alt text](https://github.com/iliyami/PhoneCallQuality/blob/master/images/1.jpg)
-![alt text](https://github.com/iliyami/PhoneCallQuality/blob/master/images/2.jpg)
-![alt text](https://github.com/iliyami/PhoneCallQuality/blob/master/images/3.jpg)
+<img src="images/1.jpg" width="200">
+<img src="images/2.jpg" width="200">
+<img src="images/3.jpg" width="200">
 
 
 
