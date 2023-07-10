@@ -45,9 +45,7 @@ SNR (Signal-to-Noise Ratio): Signal strength to noise signal ratio from the sour
 Signal Strength Level: Normalized signal strength in four states (poor, moderate, good, unknown).
 The Total Call Quality is calculated using a weighted qualitative formula, which is the result of extensive research and investigation. It has been implemented for both 4G and 5G generations, with the 5G portion being optional. The formulas are represented below:
 
-Total Call Quality (4G) = RSRP * RSRQ + RSSI - SNR
-
-Total Call Quality (5G) = RSRP * RSRQ + RSSI - SNR + Weighted Score (5G)
+<img src="images/5.jpg" width="500" title="First Version">
 
 This initial program version incorporates the above parameters and formulas to determine the call quality.
 
