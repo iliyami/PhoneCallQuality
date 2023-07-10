@@ -46,6 +46,7 @@ Signal Strength Level: Normalized signal strength in four states (poor, moderate
 The Total Call Quality is calculated using a weighted qualitative formula, which is the result of extensive research and investigation. It has been implemented for both 4G and 5G generations, with the 5G portion being optional. The formulas are represented below:
 
 Total Call Quality (4G) = RSRP * RSRQ + RSSI - SNR
+
 Total Call Quality (5G) = RSRP * RSRQ + RSSI - SNR + Weighted Score (5G)
 
 This initial program version incorporates the above parameters and formulas to determine the call quality.
